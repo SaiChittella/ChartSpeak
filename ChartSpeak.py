@@ -330,7 +330,7 @@ if __name__ == "__main__":
     # save_results()
 
     # Step 4: Run batch (set sample_size=len(image_paths) for full run)
-    # results_log, errors_log = run_batch(image_paths, client, sample_size=50)
+    results_log, errors_log = run_batch(image_paths, client, sample_size=50)
 
     # Step 5: Save results
-    # save_results(results_log)
+    save_results(results_log)
