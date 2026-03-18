@@ -1,1 +1,7 @@
 /.env
+.qodo
+.DS_Store
+.venv
+/crops
+my_model/train
+__pycache__
