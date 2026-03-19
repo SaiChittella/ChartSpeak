@@ -92,7 +92,6 @@ def extract_bar_data(image_path: str, client: genai.Client, max_retries: int = 3
                 assert isinstance(data["bars"], list), "'bars' must be a list"
                 assert len(data["bars"]) > 0, "Empty bars list"
 
-                print(data)
                 return data
 
             except json.JSONDecodeError as e:

@@ -3,6 +3,17 @@ from pynput import keyboard
 from Sound import *
 from ChartNavigator import _go_next, _go_prev, _replay, read
 
+# Hotkeys.py
+exit_callback = None
+
+def set_exit_callback(callback):
+    global exit_callback
+    exit_callback = callback
+
+def exit_app():
+    if exit_callback is not None:
+        exit_callback()
+
 pressed = set()
 
 HOTKEYS = {
@@ -15,6 +26,7 @@ HOTKEYS = {
     frozenset([keyboard.Key.cmd, keyboard.Key.ctrl, keyboard.Key.alt, keyboard.KeyCode.from_char('n')]): _go_next,
     frozenset([keyboard.Key.cmd, keyboard.Key.ctrl, keyboard.Key.alt, keyboard.KeyCode.from_char('p')]): _go_prev,
     frozenset([keyboard.Key.cmd, keyboard.Key.ctrl, keyboard.Key.alt, keyboard.KeyCode.from_char('a')]): _replay,
+    frozenset([keyboard.Key.cmd, keyboard.Key.ctrl, keyboard.Key.alt, keyboard.KeyCode.from_char('q')]): exit_app,
 }
 
 def on_press(key):

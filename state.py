@@ -17,7 +17,5 @@ class App:
         self.dev = True
         self.duration = 0.5 if self.dev else 1
 
-        print(self.cropped_image_paths)
-
 
 app = App()

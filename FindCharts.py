@@ -1,4 +1,5 @@
 import os
+from threading import Thread
 import cv2
 from ultralytics import YOLO
 from PIL import ImageGrab
@@ -10,6 +11,8 @@ def detect_crop_save(
     output_dir: str = "crops",
     conf_threshold: float = 0.5
 ):
+    t1 = Thread(target=os.system, args=('say "Detecting bar charts on screen"',), daemon=True)
+    t1.start()
 
     model_path = "./my_model/my_model.pt"
 
@@ -64,6 +67,4 @@ def detect_crop_save(
 
             saved_paths.append(save_path)
             crop_count += 1
-
     app.cropped_image_paths = saved_paths
-    print(saved_paths)
