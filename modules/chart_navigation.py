@@ -1,22 +1,8 @@
-"""
-chartNavigator.py
-==================
-Handles hotkey-driven navigation between detected bar charts.
-
-Hotkeys:
-    N — next chart
-    P — previous chart
-    R — replay current chart
-    Q — quit
-"""
-
 import os
 from pathlib import Path
 
-from pynput import keyboard
-
-from gemini import extract_bar_data, normalize_bars, setup_gemini
-from sound import playNormalizedValues
+from .gemini import extract_bar_data, normalize_bars, setup_gemini
+from .sound import playNormalizedValues
 from state import app
 
 
@@ -25,16 +11,11 @@ current    = 0
 is_playing = False
 
 
-# ── TTS ───────────────────────────────────────────────────────────────
-
 def _announce(text: str):
     os.system(f'say "{text}"')
 
 
-# ── Playback ──────────────────────────────────────────────────────────
-
 def _play_chart(index: int):
-    """Extract (or use cache) and play the chart at the given index."""
     global is_playing
 
     if is_playing:
@@ -79,8 +60,6 @@ def _play_chart(index: int):
         is_playing = False
 
 
-# ── Hotkey actions ─────────────────────────────────────────────────────
-
 def _go_next():
     global current, is_playing
 
@@ -119,8 +98,6 @@ def _quit():
     return False
 
 
-# ── Keyboard listener ──────────────────────────────────────────────────
-
 def _on_press(key):
     try:
         k = key.char.lower() if hasattr(key, 'char') and key.char else None
@@ -135,20 +112,14 @@ def _on_press(key):
         _replay()
 
 
-# ── Entry point ────────────────────────────────────────────────────────
-
 def read():
-    """
-    Plays the first chart, then blocks on the keyboard listener
-    until Q is pressed. Listener runs on main thread (required on macOS).
-    """
     total = len(app.cropped_image_paths)
 
 
 
     print(f"\n{'─' * 50}")
     print(f"  ChartSpeak — {total} chart(s) detected")
-    print(f"  N = next  |  P = previous  |  A = replay  ")
+    print(f"  N = next  |  P = previous  |  A = replay")
     print(f"{'─' * 50}\n")
 
     _announce(

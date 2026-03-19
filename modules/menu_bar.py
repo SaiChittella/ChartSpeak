@@ -1,14 +1,11 @@
 import pystray
 from PIL import Image
 
-# Open any image and convert it to a transparent PNG
-img = Image.open("ChartSpeak.png")
-img = img.convert("RGBA") # Ensures transparency support
+img = Image.open("assets/menu-bar-item.png")
+img = img.convert("RGBA")
 
-# Resize to a standard high-res tray size
 img = img.resize((64, 64), Image.Resampling.LANCZOS)
 
-# Menu.py
 def buildMenuApp(onExit):
     icon_ref = {"icon": None}
 

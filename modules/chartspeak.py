@@ -8,21 +8,19 @@ from state import app
 
 
 def detect_crop_save(
-    output_dir: str = "crops",
+    output_dir: str = "temp/crops",
     conf_threshold: float = 0.5
 ):
     t1 = Thread(target=os.system, args=('say "Detecting bar charts on screen"',), daemon=True)
     t1.start()
 
-    model_path = "./my_model/my_model.pt"
+    model_path = app.model_path
 
     snapshot = ImageGrab.grab()
-    snapshot.save("image.png")
+    image_path = app.screnshot_path
+    snapshot.save(image_path)
 
-    image_path = "image.png"
 
-    # Create output directory
-    
     for filename in os.listdir(output_dir):
         file_path = os.path.join(output_dir, filename)
         try:
@@ -34,13 +32,10 @@ def detect_crop_save(
     os.makedirs(output_dir, exist_ok=True)
 
 
-    # Load model
     model = YOLO(model_path)
 
-    # Run inference
     results = model(image_path, conf=conf_threshold)
 
-    # Read original image
     image = imread(image_path)
 
     saved_paths = []
@@ -53,14 +48,11 @@ def detect_crop_save(
         for box, score in zip(boxes, scores):
             x1, y1, x2, y2 = map(int, box.tolist())
 
-            # Crop the image
             crop = image[y1:y2, x1:x2]
 
-            # Skip empty crops (safety)
             if crop.size == 0:
                 continue
 
-            # Save crop
             filename = f"crop_{crop_count}.jpg"
             save_path = os.path.join(output_dir, filename)
             imwrite(save_path, crop)

@@ -8,10 +8,6 @@ import json
 
 from state import app
 
-# ─────────────────────────────────────────────
-#  Load environment variables from .env
-# ─────────────────────────────────────────────
-
 load_dotenv()
 
 GEMINI_API_KEY   = os.getenv("GEMINI_API_KEY")
@@ -20,7 +16,6 @@ if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY not found. Make sure it's set in your .env file.")
 
 def setup_gemini() -> genai.Client:
-    """Initialize and test the Gemini client."""
     if app.dev:
         print("✅ Gemini ready")
         return None
@@ -62,7 +57,6 @@ def extract_bar_data(image_path: str, client: genai.Client, max_retries: int = 3
     if app.dev:
         return DUMMY_DATA
     else:
-        """Send a chart image to Gemini and return structured bar data."""
         img = PIL.Image.open(image_path)
 
         for attempt in range(max_retries):
@@ -73,7 +67,6 @@ def extract_bar_data(image_path: str, client: genai.Client, max_retries: int = 3
                 )
                 raw_text = response.text.strip()
 
-                # Strip markdown fences if Gemini adds them despite instructions
                 raw_text = re.sub(r"^```json\s*", "", raw_text)
                 raw_text = re.sub(r"^```\s*",     "", raw_text)
                 raw_text = re.sub(r"\s*```$",     "", raw_text)
@@ -102,7 +95,6 @@ def extract_bar_data(image_path: str, client: genai.Client, max_retries: int = 3
 
 
 def normalize_bars(data: dict) -> list[dict]:
-    """Normalize each bar's raw value to [0, 1] using the axis scale."""
     y_min = data["y_axis_min"]
     y_max = data["y_axis_max"]
 
