@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 from google import genai
 import PIL
+import json
 
 # ─────────────────────────────────────────────
 #  Load environment variables from .env
@@ -94,3 +95,27 @@ def extract_bar_data(image_path: str, client: genai.Client, max_retries: int = 3
             time.sleep(2)
 
     return None
+
+def normalize_bars(data: dict) -> list[dict]:
+    """Normalize each bar's raw value to [0, 1] using the axis scale."""
+    y_min = data["y_axis_min"]
+    y_max = data["y_axis_max"]
+
+    if y_max == y_min:
+        return [{"bar_index": i, "label": b.get("label", str(i)),
+                 "raw_value": b["raw_value"], "normalized_value": 0.5}
+                for i, b in enumerate(data["bars"])]
+
+    normalized = []
+    for i, bar in enumerate(data["bars"]):
+        raw  = bar["raw_value"]
+        norm = (raw - y_min) / (y_max - y_min)
+        norm = max(0.0, min(1.0, norm))
+        normalized.append({
+            "bar_index":        i,
+            "label":            bar.get("label", str(i)),
+            "raw_value":        round(raw,  4),
+            "normalized_value": round(norm, 4)
+        })
+
+    return normalized

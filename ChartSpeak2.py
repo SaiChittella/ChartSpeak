@@ -18,12 +18,13 @@ Usage:
     python bar_chart_analyzer.py
 """
 
+
 import os
 import json
 import re
 import time
 from pathlib import Path
-
+from chartNavigator import run
 
 import PIL.Image
 import matplotlib.pyplot as plt
@@ -34,6 +35,8 @@ from google import genai
 import os
 import cv2
 from ultralytics import YOLO
+
+from state import app
 
 from sound import playNormalizedValues
 
@@ -53,8 +56,6 @@ if not GEMINI_API_KEY:
 # ─────────────────────────────────────────────
 
 def detect_crop_save(
-    model_path: str,
-    image_path: str,
     output_dir: str = "crops",
     conf_threshold: float = 0.25
 ):
@@ -71,6 +72,9 @@ def detect_crop_save(
     Returns:
         List[str]: Paths to cropped images
     """
+
+    model_path = YOLO(app.model_path)
+    image_path = app.test_image_path
 
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
@@ -109,23 +113,8 @@ def detect_crop_save(
             saved_paths.append(save_path)
             crop_count += 1
 
-    return saved_paths
+    app.cropped_image_paths =  saved_paths
 
-# ─────────────────────────────────────────────
-#  Cell 3 — Gemini Client Setup
-# ─────────────────────────────────────────────
-
-def setup_gemini() -> genai.Client:
-    """Initialize and test the Gemini client."""
-    client = genai.Client(api_key=GEMINI_API_KEY)
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents="Reply with just: OK"
-    )
-    print("Gemini connection test:", response.text.strip())
-    print("✅ Gemini ready")
-    return client
 
 
 # ─────────────────────────────────────────────
@@ -288,24 +277,35 @@ def save_results(results_log: list, output_path: str = "chartdata_normalized.jso
 #  Main
 # ─────────────────────────────────────────────
 
+# if __name__ == "__main__":
+
+#     image_paths = detect_crop_save("./my_model/my_model.pt", "./test.png")
+
+#     if not image_paths:
+#         raise RuntimeError("No bar chart images found. Check the dataset path.")
+
+#     # Step 2: Set up Gemini
+#     client = setup_gemini()
+
+#     # Step 3: Test on a single image first
+#     x = test_single_image(image_paths[0], client)
+#     noramlized_values = []
+
+#     for obj in x:
+#         print(obj)
+#         noramlized_values.append(obj["normalized_value"])
+
+#     playNormalizedValues(noramlized_values)
+
+#     # save_results()
+
+
 if __name__ == "__main__":
 
-    image_paths = detect_crop_save("./my_model/my_model.pt", "./test.png")
+    detect_crop_save()  
 
-    if not image_paths:
-        raise RuntimeError("No bar chart images found. Check the dataset path.")
 
-    # Step 2: Set up Gemini
-    client = setup_gemini()
-
-    # Step 3: Test on a single image first
-    x = test_single_image(image_paths[0], client)
-    noramlized_values = []
-
-    for obj in x:
-        print(obj)
-        noramlized_values.append(obj["normalized_value"])
-
-    playNormalizedValues(noramlized_values)
-
-    # save_results()
+    # Step 3: Hand off all charts to navigator
+    # Navigator plays first chart automatically, then waits for hotkeys:
+    # N = next | P = previous | R = replay | Q = quit
+    run()
