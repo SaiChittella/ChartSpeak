@@ -1,7 +1,8 @@
 from FindCharts import detect_crop_save
 from pynput import keyboard
-from sound import *
+
 from ChartNavigator import _go_next, _go_prev, _replay, read
+from sound import decrease_high_note, decrease_low_note, increase_high_note, increase_low_note
 
 # Hotkeys.py
 exit_callback = None

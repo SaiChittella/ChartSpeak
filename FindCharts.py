@@ -1,6 +1,6 @@
 import os
 from threading import Thread
-import cv2
+from cv2 import imread, imwrite
 from ultralytics import YOLO
 from PIL import ImageGrab
 
@@ -41,7 +41,7 @@ def detect_crop_save(
     results = model(image_path, conf=conf_threshold)
 
     # Read original image
-    image = cv2.imread(image_path)
+    image = imread(image_path)
 
     saved_paths = []
     crop_count = 0
@@ -63,7 +63,7 @@ def detect_crop_save(
             # Save crop
             filename = f"crop_{crop_count}.jpg"
             save_path = os.path.join(output_dir, filename)
-            cv2.imwrite(save_path, crop)
+            imwrite(save_path, crop)
 
             saved_paths.append(save_path)
             crop_count += 1
