@@ -28,15 +28,31 @@ def play_frequency(freq, fs=44100, amplitude=0.5):
     duration = app.duration 
     
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
-    
-    wave = amplitude * np.sin(2 * np.pi * freq * t)
-    
+
+    # Create a richer timbre by combining sine waves
+    wave = (
+        0.6 * np.sin(2 * np.pi * freq * t) +  # Fundamental frequency
+        0.3 * np.sin(2 * np.pi * (freq * 2) * t) +  # First harmonic
+        0.1 * np.sin(2 * np.pi * (freq * 3) * t)    # Second harmonic
+    )
+
+    # Apply an ADSR envelope
+    attack = int(0.1 * len(t))  # 10% of the duration
+    release = int(0.1 * len(t))  # 10% of the duration
+    sustain = len(t) - attack - release
+    envelope = np.concatenate([
+        np.linspace(0, 1, attack),  # Attack
+        np.ones(sustain),           # Sustain
+        np.linspace(1, 0, release)  # Release
+    ])
+
+    wave *= envelope[:len(t)]  # Apply envelope
+
+    # Normalize to avoid clipping
+    wave *= amplitude
+
     sd.play(wave, fs)
     sd.wait()
-
-import numpy as np
-import sounddevice as sd
-from state import app
 
 def playNormalizedValues(values):
 
@@ -53,7 +69,23 @@ def playNormalizedValues(values):
 
     def generate_tone(freq, duration, fs):
         t = np.linspace(0, duration, int(fs * duration), False)
-        tone = np.sin(2 * np.pi * freq * t)
+        tone = (
+            0.6 * np.sin(2 * np.pi * freq * t) +  # Fundamental frequency
+            0.3 * np.sin(2 * np.pi * (freq * 2) * t) +  # First harmonic
+            0.1 * np.sin(2 * np.pi * (freq * 3) * t)    # Second harmonic
+        )
+
+        # Apply an ADSR envelope
+        attack = int(0.1 * len(t))  # 10% of the duration
+        release = int(0.1 * len(t))  # 10% of the duration
+        sustain = len(t) - attack - release
+        envelope = np.concatenate([
+            np.linspace(0, 1, attack),  # Attack
+            np.ones(sustain),           # Sustain
+            np.linspace(1, 0, release)  # Release
+        ])
+
+        tone *= envelope[:len(t)]  # Apply envelope
         return tone
 
     # Build full audio signal
