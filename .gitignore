@@ -1,1 +1,8 @@
 /.env
+.qodo
+.DS_Store
+.venv
+temp/crops/*
+temp/screenshot.png
+model/train
+__pycache__
