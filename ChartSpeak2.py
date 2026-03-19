@@ -18,7 +18,6 @@ Usage:
     python bar_chart_analyzer.py
 """
 
-
 import os
 import json
 import re
@@ -38,7 +37,7 @@ from ultralytics import YOLO
 
 from state import app
 
-from Sound import playNormalizedValues
+from sound import playNormalizedValues
 
 # ─────────────────────────────────────────────
 #  Load environment variables from .env

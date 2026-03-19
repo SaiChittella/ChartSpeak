@@ -1,6 +1,6 @@
 from FindCharts import detect_crop_save
 from pynput import keyboard
-from Sound import *
+from sound import *
 from ChartNavigator import _go_next, _go_prev, _replay, read
 
 pressed = set()

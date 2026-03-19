@@ -16,7 +16,7 @@ from pathlib import Path
 from pynput import keyboard
 
 from gemini import extract_bar_data, normalize_bars, setup_gemini
-from Sound import playNormalizedValues
+from sound import playNormalizedValues
 from state import app
 
 
