@@ -24,7 +24,7 @@ import json
 import re
 import time
 from pathlib import Path
-from chartNavigator import run
+from ChartNavigator import read
 
 import PIL.Image
 import matplotlib.pyplot as plt
@@ -38,7 +38,7 @@ from ultralytics import YOLO
 
 from state import app
 
-from sound import playNormalizedValues
+from Sound import playNormalizedValues
 
 # ─────────────────────────────────────────────
 #  Load environment variables from .env
@@ -308,4 +308,4 @@ if __name__ == "__main__":
     # Step 3: Hand off all charts to navigator
     # Navigator plays first chart automatically, then waits for hotkeys:
     # N = next | P = previous | R = replay | Q = quit
-    run()
+    read()

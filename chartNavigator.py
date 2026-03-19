@@ -11,13 +11,12 @@ Hotkeys:
 """
 
 import os
-import threading
 from pathlib import Path
 
 from pynput import keyboard
 
 from gemini import extract_bar_data, normalize_bars, setup_gemini
-from sound import playNormalizedValues
+from Sound import playNormalizedValues
 from state import app
 
 
@@ -29,11 +28,7 @@ is_playing = False
 # ── TTS ───────────────────────────────────────────────────────────────
 
 def _announce(text: str):
-    """Non-blocking macOS TTS."""
-    threading.Thread(
-        target=lambda: os.system(f'say "{text}"'),
-        daemon=True
-    ).start()
+    os.system(f'say "{text}"')
 
 
 # ── Playback ──────────────────────────────────────────────────────────
@@ -94,7 +89,7 @@ def _go_next():
 
     if current < len(app.cropped_image_paths) - 1:
         current += 1
-        threading.Thread(target=_play_chart, args=(current,), daemon=True).start()
+        _play_chart(current)
     else:
         _announce("This is the last chart.")
 
@@ -107,7 +102,7 @@ def _go_prev():
 
     if current > 0:
         current -= 1
-        threading.Thread(target=_play_chart, args=(current,), daemon=True).start()
+        _play_chart(current)
     else:
         _announce("This is the first chart.")
 
@@ -116,7 +111,7 @@ def _replay():
     global is_playing
 
     is_playing = False
-    threading.Thread(target=_play_chart, args=(current,), daemon=True).start()
+    _play_chart(current)
 
 
 def _quit():
@@ -138,22 +133,22 @@ def _on_press(key):
         _go_prev()
     elif k == 'r':
         _replay()
-    elif k == 'q':
-        return _quit()  # returning False stops the listener
 
 
 # ── Entry point ────────────────────────────────────────────────────────
 
-def run():
+def read():
     """
     Plays the first chart, then blocks on the keyboard listener
     until Q is pressed. Listener runs on main thread (required on macOS).
     """
     total = len(app.cropped_image_paths)
 
+
+
     print(f"\n{'─' * 50}")
     print(f"  ChartSpeak — {total} chart(s) detected")
-    print(f"  N = next  |  P = previous  |  R = replay  |  Q = quit")
+    print(f"  N = next  |  P = previous  |  A = replay  ")
     print(f"{'─' * 50}\n")
 
     _announce(
@@ -161,9 +156,4 @@ def run():
         f"Press N for next, P for previous, R to replay, Q to quit."
     )
 
-    # Play first chart in background so main thread stays free for listener
-    threading.Thread(target=_play_chart, args=(0,), daemon=True).start()
-
-    # Listener MUST run on main thread on macOS
-    with keyboard.Listener(on_press=_on_press) as listener:
-        listener.join()
+    _play_chart(0)
